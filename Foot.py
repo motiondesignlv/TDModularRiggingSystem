@@ -1,4 +1,4 @@
-﻿##-*- coding:utf-8 -*-
+#-*- coding:utf-8 -*-
 import maya.cmds as cmds
 from TDModularRiggingSystem import RiggingSystem
 
