@@ -8,28 +8,20 @@ class TDRootRigging():
         self.TDMRS  = RiggingSystem.ModularRiggingSystem()
 
     "-----コマンドの実行-----"
-    def setRootRigging(self,rootJoints,CtlColor):
-        self.rootJoint = TDRootRigging.createRootJoint(self,[rootJoints])
-        self.RootCtlList = TDRootRigging.createRootCtl(self,rootJoints,CtlColor)
+    def setRootRigging(self,CtlName,CtlColor):
+        self.RootCtlList = TDRootRigging.createRootCtl(self,CtlName,CtlColor)
         self.createRootCtlConnection(self)
 
-        return [self.RootCtlList[0],self.RootCtlList[1],self.RootCtlList[2],self.rootJoint[0]]
-
-    #ルートリグ用の新しいジョイントを作成
-    def createRootJoint(self,rootJoints):
-        self.rootJoint = self.TDMRS.createRiggingJoint(rootJoints,1,"Add")
-
-        return self.rootJoint
+        return self.RootCtlList
 
     #ルートコントローラー
-    def createRootCtl(self,rootJoints,CtlColor):
-        self.RootCtl = self.TDMRS.createMatrixRigController(self.TDMRS.TDcrc.TDDirFourFat,rootJoints,rootJoints,CtlColor,40)
-        self.RootGP = self.TDMRS.createChildAttrToParentGP(self.rootJoint[0],"Connection_From__%s"%self.RootCtl)
-        self.RootJointGP = self.TDMRS.createGP(self.RootGP,"%sJoint_Offset"%rootJoints)
-        self.RootCtlGP = self.TDMRS.createGP(self.RootCtl,"%sCtl_Grp"%rootJoints)
-        self.RootCtlOffset = self.TDMRS.createChildAttrToParentGP(self.RootCtl,"%sCtl_Offset"%rootJoints)
+    def createRootCtl(self,CtlName,CtlColor):
+        self.RootCtl = self.TDMRS.createMatrixRigController(self.TDMRS.TDcrc.TDDirFourFat,CtlName,CtlName,CtlColor,40)
+        self.RootGP = self.TDMRS.createChildAttrToParentGP(CtlName,"%sConnection_From__%s"%(CtlName,self.RootCtl))
+        self.RootCtlGP = self.TDMRS.createGP(self.RootCtl,"%s_GP"%self.RootCtl)
+        self.RootCtlOffset = self.TDMRS.createChildAttrToParentGP(self.RootCtl,"%s_Offset"%self.RootCtl)
 
-        return [self.RootCtlGP,self.RootJointGP,self.RootCtl]
+        return [self.RootCtl,self.RootGP,self.RootCtlGP]
 
     #ルートコントローラーの関連づけ
     def createRootCtlConnection(self,*argv):
