@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 """モジュラーリギングシステム"""
 import maya.cmds as cmds
@@ -28,10 +28,12 @@ reload(All)
 
 #コントローラーの階層化
 class TDCtlLayering():
-    def setCtlLayering(self):
+    def setAllCtlLayering(self):
         "【オール】"
         cmds.parent(AllCtlList,"Ctl_GP")
+        cmds.parent(RootCtlList[0],"All_Ctl")
         cmds.parent(RootCtlList[1],"Joint_GP")
+    def setCtlLayering(self):
         "【スイッチ】"
         cmds.parent(SwitchCtlList[0],"All_Ctl")
         "【ルート】"
@@ -50,15 +52,19 @@ class TDCtlLayering():
         cmds.parent(RArmCtlList[0],"IKSystem_GP")
         cmds.parent(LArmCtlList[1],"All_Ctl")
         cmds.parent(RArmCtlList[1],"All_Ctl")
-        "【脚】"
-        cmds.parent(RFootCtlList[0],"IKSystem_GP")
-        cmds.parent(LFootCtlList[0],"IKSystem_GP")
-        cmds.parent(RFootCtlList[1],"All_Ctl")
-        cmds.parent(LFootCtlList[1],"All_Ctl")
-        cmds.parent(RFootCtlList[2],"JointSystem_GP")
-        cmds.parent(LFootCtlList[2],"JointSystem_GP")
         
         print "result setup.",
+        
+    def setFootCtlLayering(self):
+        "【脚】"
+        cmds.parent(RFootCtlList[0],"All_Ctl")
+        cmds.parent(LFootCtlList[0],"All_Ctl")
+        cmds.parent(RFootCtlList[1],RootCtlList[-1])
+        cmds.parent(LFootCtlList[1],RootCtlList[-1])
+        cmds.parent(RFootCtlList[2],"IKSystem_GP")
+        cmds.parent(LFootCtlList[2],"IKSystem_GP")
+        cmds.parent(RFootCtlList[3],"IKSystem_GP")
+        cmds.parent(LFootCtlList[3],"IKSystem_GP")
     
     #コントローラーの親子構造を作成
     def setCtlParent(self):
@@ -75,26 +81,37 @@ TDMRS  = RiggingSystem.ModularRiggingSystem()
 All    = All.TDAllCtlRigging()
 Root   = Root.TDRootRigging()
 Spine  = Spine.TDSpineRigging()
+"""
 Neck   = Neck.TDHeadRigging()
 Head   = Head.TDHeadRigging()
+"""
 Foot   = Foot.TDFootRigging()
+"""
 Arm    = Arm.TDArmRigging()
 Swing  = Swing.TDSwingCtlRigging()
 Switch = Switch.TDSwitchCtlRigging()
+"""
 Layer  = TDCtlLayering()
 
 
 TDMRS.createRigHierarchy()
 AllCtlList    = All.setAllRigging(20)
 RootCtlList   = Root.setRootRigging(TDMRS.getJointLabelType()[0,1],14)
-SwitchCtlList = Switch.setSwitchRigging(20)
-SpineCtlList  = Spine.setSpineRigging(TDMRS.getJointLabelType()[0,1],17)
+#SwitchCtlList = Switch.setSwitchRigging(20)
+SpineCtlList  = Spine.setSpineRigging(TDMRS.getSpineJoint(),17)
+"""
 NeckCtlList   = Neck.setHeadRigging(TDMRS.getJointLabelType()[0,7],TDMRS.getJointLabelType()[0,6],17)
 HeadCtlList   = Head.setHeadRigging(TDMRS.getJointLabelType()[0,8],TDMRS.getJointLabelType()[0,7],17)
-LFootCtlList  = Foot.setFootRigging(1,6)
-RFootCtlList  = Foot.setFootRigging(2,13)
+"""
+LFootCtlList  = Foot.setFootRigging([TDMRS.getJointLabelType()[1,2],TDMRS.getJointLabelType()[1,3],TDMRS.getJointLabelType()[1,4]],13)
+RFootCtlList  = Foot.setFootRigging([TDMRS.getJointLabelType()[2,2],TDMRS.getJointLabelType()[2,3],TDMRS.getJointLabelType()[2,4]],13)
+
+"""
 SwingCtlList  = Swing.setSwingRigging(TDMRS.getJointLabelType()[0,1],4)
 LArmCtlList   = Arm.setArmRigging(1,6,SwitchCtlList[0],SwitchCtlList[1])
 RArmCtlList   = Arm.setArmRigging(2,13,SwitchCtlList[0],SwitchCtlList[2])
-Layer.setCtlLayering()
-Layer.setCtlParent()
+"""
+Layer.setAllCtlLayering()
+Layer.setFootCtlLayering()
+#Layer.setCtlParent()
+
