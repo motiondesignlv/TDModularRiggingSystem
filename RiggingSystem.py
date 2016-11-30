@@ -98,10 +98,12 @@ class ModularRiggingSystem(object):
         cmds.setAttr(self.RigCtr+".overrideColor",color)
         cmds.setAttr(self.RigCtr+".scale",scale,scale,scale)
         cmds.makeIdentity(self.RigCtr,apply=True,t=1,r=1,s=1)
+        self.ctlOffsetGP = cmds.group(self.RigCtr,n="%s_Offset"%self.RigCtr)
+        cmds.xform(self.ctlOffsetGP,piv=[0,0,0])
         self.pc = cmds.xform(pcName,q=True,ws=True,rp=True)
-        cmds.setAttr(self.RigCtr+".translate",*self.pc)
-        cmds.makeIdentity(self.RigCtr,apply=True,t=1,r=1,s=1)
-        return self.RigCtr
+        cmds.setAttr(self.ctlOffsetGP+".translate",*self.pc)
+        #cmds.makeIdentity(self.RigCtr,apply=True,t=1,r=1,s=1)
+        return [self.ctlOffsetGP,self.RigCtr]
 
     #アトリビュートの非表示とロック
     #name : メソッド名 , attrName　：　アトリビュート名 , lock : ロック , hide : 非表示
@@ -172,7 +174,7 @@ class ModularRiggingSystem(object):
         return self.dupJointList
 
     #リギング用の新しいジョイントを作成
-    def createRiggingJoint(self,jointName):
+    def createRiggingJoint(self,jointName,const,name):
         self.jointList = []
         #self.dagJoint = cmds.ls(jointName,dag=True,type="joint") #選択したジョイント階層をすべて取得
         cmds.select(d=True)
@@ -181,12 +183,25 @@ class ModularRiggingSystem(object):
             self.jointSide = cmds.getAttr(joints+".side")#ジョイントのサイド
             self.jointType = cmds.getAttr(joints+".type")#ジョイントのタイプ
 
-            self.joint = cmds.joint(p=self.pivot,n="Add_%s"%joints)
+            self.joint = cmds.joint(p=self.pivot,n="%s_%s"%(name,joints))
             cmds.setAttr(self.joint+".side",self.jointSide)
             cmds.setAttr(self.joint+".type",self.jointType)
             self.jointList.append(self.joint)
             #cmds.parent(self.jointList[0],w=True)
             cmds.makeIdentity(self.joint,a=True,t=True,r=True,s=True,pn=True,jointOrient=True)
-            cmds.parentConstraint(self.joint,joints,mo=True)
+            if const == 0:pass
+            elif const == 1:cmds.parentConstraint(self.joint,joints,mo=True)
 
         return self.jointList
+
+    #Nurbsコントローラーの大きさを変更
+    def setNurbsCtlScaling(self,ctl,valueX,valueY,valueZ):
+        self.sel = cmds.ls(ctl)#,fl=True
+        self.pp = []
+        for sels in self.sel:
+            self.spans = cmds.getAttr(self.sel[0]+".spans")
+            for i in range(self.spans):
+                self.point = cmds.pointPosition(sels+".cv[%d]"%i,l=True)
+                self.pivot = cmds.xform(sels,q=True,ws=True,rp=True)
+                self.point = [self.point[0]*valueX-self.pivot[0], self.point[1]*valueY-self.pivot[1], self.point[2]*valueZ-self.pivot[2]]
+                cmds.xform(sels+".cv[%d]"%i,t=self.point)
