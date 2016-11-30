@@ -81,8 +81,8 @@ TDMRS  = RiggingSystem.ModularRiggingSystem()
 All    = All.TDAllCtlRigging()
 Root   = Root.TDRootRigging()
 Spine  = Spine.TDSpineRigging()
+Neck   = Neck.TDNeckRigging()
 """
-Neck   = Neck.TDHeadRigging()
 Head   = Head.TDHeadRigging()
 """
 Foot   = Foot.TDFootRigging()
@@ -99,8 +99,8 @@ AllCtlList    = All.setAllRigging(20)
 RootCtlList   = Root.setRootRigging(TDMRS.getJointLabelType()[0,1],14)
 #SwitchCtlList = Switch.setSwitchRigging(20)
 SpineCtlList  = Spine.setSpineRigging(TDMRS.getSpineJoint(),17)
+NeckCtlList   = Neck.setNeckRigging(TDMRS.getNeckJoint(),17)
 """
-NeckCtlList   = Neck.setHeadRigging(TDMRS.getJointLabelType()[0,7],TDMRS.getJointLabelType()[0,6],17)
 HeadCtlList   = Head.setHeadRigging(TDMRS.getJointLabelType()[0,8],TDMRS.getJointLabelType()[0,7],17)
 """
 LFootCtlList  = Foot.setFootRigging([TDMRS.getJointLabelType()[1,2],TDMRS.getJointLabelType()[1,3],TDMRS.getJointLabelType()[1,4]],13)
