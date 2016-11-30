@@ -24,15 +24,15 @@ class TDRootRigging():
     #ルートコントローラー
     def createRootCtl(self,rootJoints,CtlColor):
         self.RootCtl = self.TDMRS.createMatrixRigController(self.TDMRS.TDcrc.TDDirFourFat,rootJoints,rootJoints,CtlColor,40)
-        self.RootGP = self.TDMRS.createChildAttrToParentGP(self.rootJoint[0],"Connection_From__%s"%self.RootCtl)
+        self.RootGP = self.TDMRS.createChildAttrToParentGP(self.rootJoint[0],"ConnectionFrom__%s"%self.RootCtl[1])
         self.RootJointGP = self.TDMRS.createGP(self.RootGP,"%sJoint_Offset"%rootJoints)
-        self.RootCtlGP = self.TDMRS.createGP(self.RootCtl,"%sCtl_Grp"%rootJoints)
-        self.RootCtlOffset = self.TDMRS.createChildAttrToParentGP(self.RootCtl,"%sCtl_Offset"%rootJoints)
+        self.RootCtlGP = self.TDMRS.createGP(self.RootCtl[0],"%sCtl_Grp"%rootJoints)
+        #self.RootCtlOffset = self.TDMRS.createChildAttrToParentGP(self.RootCtl,"%sCtl_Offset"%rootJoints)
 
         return [self.RootCtlGP,self.RootJointGP,self.RootCtl]
 
     #ルートコントローラーの関連づけ
     def createRootCtlConnection(self,*argv):
-        self.RootCtrpp = self.TDMRS.matrixConstraint(self.RootCtl,self.RootGP)
+        self.RootCtrpp = self.TDMRS.matrixConstraint(self.RootCtl[1],self.RootGP)
 
         return self.RootCtrpp
