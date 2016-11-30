@@ -24,6 +24,16 @@ class ModularRiggingSystem(object):
             self.jointLabel[self.jointSide,self.jointType] = self.selHJs
         return self.jointLabel
 
+    #首のジョイントを取得
+    def getNeckJoint(self):
+        self.neckJoint = [] #背骨ジョイント
+        for self.selHJs in self.selHJ:
+            self.jointSide = cmds.getAttr(self.selHJs+".side")#ジョイントのサイド
+            self.jointType = cmds.getAttr(self.selHJs+".type")#ジョイントのタイプ
+            if self.jointType == 7:
+                self.neckJoint.append(self.selHJs)
+        return self.neckJoint
+
     #背骨のジョイントを取得
     def getSpineJoint(self):
         self.spineJoint = [] #背骨ジョイント
@@ -151,10 +161,12 @@ class ModularRiggingSystem(object):
         cmds.setAttr(self.RigCtr+".overrideColor",color)
         cmds.setAttr(self.RigCtr+".scale",scale,scale,scale)
         cmds.makeIdentity(self.RigCtr,apply=True,t=1,r=1,s=1)
-        self.pc = cmds.xform(pcName,q=True,ws=True,rp=True)
-        cmds.setAttr(self.RigCtr+".translate",*self.pc)
+        self.ctlOffsetGP = cmds.group(self.RigCtr,n="%s_Offset"%self.RigCtr)
+        cmds.xform(self.ctlOffsetGP,piv=[0,0,0])
+        self.pc = cmds.xform(pcName,q=True,ws=True,t=True)
+        cmds.setAttr(self.ctlOffsetGP+".translate",*self.pc)
         #self.createChildAttrToParentGP(CtlName,self.RigCtr)
-        return self.RigCtr
+        return [self.ctlOffsetGP,self.RigCtr]
 
     #モジュール関連づけ用のヌルを作成
     def createModuleParentNull(self,parentName,childName):
