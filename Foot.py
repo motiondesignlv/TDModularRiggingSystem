@@ -9,14 +9,21 @@ class TDFootRigging():
 
     "-----コマンドの実行-----"
     def setFootRigging(self,footJoints,CtlColor):#LR,CtlColor
+        #--ジョイントの作成--
         TDFootRigging.createFootJoint(self,footJoints)
-        TDFootRigging.createFootFKJoint(self,footJoints)
+        self.FKJoint = TDFootRigging.createFootFKJoint(self,footJoints)
         self.IKJoint = TDFootRigging.createFootIKJoint(self,footJoints)
+        #--コントローラーの作成--
+        TDFootRigging.createFootFKCtl(self,self.FKJoint,CtlColor)
         TDFootRigging.createFootIKCtl(self,self.IKJoint[-1],CtlColor)
         self.IKHandleGP = TDFootRigging.createFootIKHandle(self,self.IKJoint[0],self.IKJoint[-1])
         TDFootRigging.createKneeIKCtl(self,self.IKJoint[1],CtlColor)
         TDFootRigging.createAnnotateNode(self,self.IKJoint[1])
-        TDFootRigging.createFootConnection(self,footJoints)
+        TDFootRigging.createFootFKIKSwitchCtl(self,footJoints)
+        #--コントローラーとジョイントのコネクション--
+        TDFootRigging.createFootFKConnection(self,footJoints)
+        TDFootRigging.createFootIKConnection(self,footJoints)
+        #--コントローラーとジョイントの階層分け--
         self.IKFootGrpList = TDFootRigging.setFootRigLayering(self,self.IKJoint[-1])
 
         return [self.IKFootGrpList[0],self.IKFootGrpList[1],self.IKFootGrpList[2],self.IKHandleGP]
@@ -33,7 +40,7 @@ class TDFootRigging():
     def createFootFKJoint(self,footJoints):
         self.FKJoint = self.TDMRS.createRiggingJoint(footJoints,0,"FK")#FKジョイントを取得
         cmds.setAttr(self.FKJoint[1]+".preferredAngleX",90)
-        self.FKFootGP = self.TDMRS.createGP(self.FKJoint[0],"%s_GP"%self.FKJoint[2])
+        self.FKFootGP = self.TDMRS.createGP(self.FKJoint[0],"%s_Grp"%self.FKJoint[2])
         #cmds.setAttr(self.FKFootGP+".visibility",0)
 
         return self.FKJoint
@@ -42,10 +49,24 @@ class TDFootRigging():
     def createFootIKJoint(self,footJoints):
         self.IKJoint = self.TDMRS.createRiggingJoint(footJoints,0,"IK")#FKジョイントを取得
         cmds.setAttr(self.IKJoint[1]+".preferredAngleX",90)
-        self.IKFootGP = self.TDMRS.createGP(self.IKJoint[0],"%s_GP"%self.IKJoint[2])
+        self.IKFootGP = self.TDMRS.createGP(self.IKJoint[0],"%s_Grp"%self.IKJoint[2])
         #cmds.setAttr(self.IKFootGP+".visibility",0)
 
         return self.IKJoint
+
+    #FK制御用のコントローラーの作成
+    def createFootFKCtl(self,FKJoint,CtlColor):
+        self.FKFootCtls = [] #FKコントローラーのリスト
+        self.FKFootCtlOffset = [] #FKコントローラーのオフセットリスト
+        for fkFootCtls in range(len(FKJoint)):
+            self.FKFootCtl = self.TDMRS.createRigController(self.TDMRS.TDcrc.TDCircle,FKJoint[fkFootCtls],FKJoint[fkFootCtls],CtlColor,15)
+            if fkFootCtls > 0:
+                cmds.parent(self.FKFootCtl[0],self.FKFootCtls[fkFootCtls-1])
+            self.FKFootCtls.append(self.FKFootCtl[1])
+            self.FKFootCtlOffset.append(self.FKFootCtl[0])
+        self.FKFootCtlGP = self.TDMRS.createGP(self.FKFootCtlOffset[0],"%s_Grp"%self.FKFootCtls[0])
+
+        return [self.FKFootCtlGP, self.FKFootCtls[-1]]
 
     #IK制御用のコントローラーを作成
     def createFootIKCtl(self,IKjoint,CtlColor):
@@ -87,11 +108,32 @@ class TDFootRigging():
         cmds.xform(self.annotateNull,t=self.getPosition)
         self.annotate = cmds.annotate(self.annotateNull)
         self.annotate = cmds.rename(cmds.listRelatives(self.annotate,p=True),"%s_annotate"%footJoints)
-        cmds.pointConstraint(self.IKKneeCtl[1],self.annotate)
-        cmds.parentConstraint(footJoints,self.annotateNull)
+        cmds.setAttr(self.annotate+"Shape.overrideEnabled",1)
+        cmds.setAttr(self.annotate+"Shape.overrideDisplayType",2)
+        cmds.setAttr(self.annotateNull[0]+".visibility",0)
+        cmds.pointConstraint(self.IKKneeCtl[1],self.annotateNull)
+        cmds.parentConstraint(footJoints,self.annotate)
 
-    #コントローラーのコンストレイント関係
-    def createFootConnection(self,footJoints):
+    #IKFKスイッチコントローラーを作成
+    def createFootFKIKSwitchCtl(self,footJoints):
+        self.FootFKIKSwitchCtl = self.TDMRS.createRigController(self.TDMRS.TDcrc.TDdial1,"%s_FKIKSwitch"%footJoints[0],self.FKJoint[0],20,1)
+        self.getPosition = cmds.xform(self.FKJoint[0],q=True,ws=True,rp=True)
+        cmds.setAttr(self.FootFKIKSwitchCtl[0]+".rotateX",90)
+        cmds.setAttr(self.FootFKIKSwitchCtl[0]+".translateX",self.getPosition[0]*3)
+
+        #self.TDMRS.createHideAttr(self.FootFKIKSwitchCtl[1],"t",1,0)
+        self.TDMRS.createHideAttr(self.FootFKIKSwitchCtl[1],"r",1,0)
+        self.TDMRS.createHideAttr(self.FootFKIKSwitchCtl[1],"s",1,0)
+        self.TDMRS.createHideAttr(self.FootFKIKSwitchCtl[1],"v",1,0)
+
+
+    #FKコントローラーのコンストレイント関係
+    def createFootFKConnection(self,footJoints):
+        for Joints in range(len(footJoints)):
+            self.TDMRS.matrixConstraint(self.FKFootCtls[Joints],self.FKJoint[Joints])
+
+    #IKコントローラーのコンストレイント関係
+    def createFootIKConnection(self,footJoints):
         for Joints in range(len(footJoints)):
             cmds.orientConstraint(self.FKJoint[Joints],self.footJoint[Joints],mo=True,w=0)
             cmds.orientConstraint(self.IKJoint[Joints],self.footJoint[Joints],mo=True,w=1)
