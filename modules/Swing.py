@@ -1,11 +1,11 @@
 #-*- coding:utf-8 -*-
 import maya.cmds as cmds
-from TDModularRiggingSystem import RiggingSystem
+from TDModularRiggingSystem.lib import System as System
 
 #スウィングコントローラーのリギング
 class TDSwingCtlRigging():
     def __init__(self):
-        self.TDMRS  = RiggingSystem.ModularRiggingSystem()
+        self.System  = RiggingSystem.ModularRiggingSystem()
 
     "-----コマンドの実行-----"
     def setSwingRigging(self,CtlName,CtlColor):
@@ -16,9 +16,9 @@ class TDSwingCtlRigging():
 
     #腰ふりコントローラー
     def createSwingCtl(self,CtlName,CtlColor):
-        self.SwingCtl = self.TDMRS.createRigController(self.TDMRS.TDcrc.TDDistortCircle,"Swing",CtlName,CtlColor,30)
+        self.SwingCtl = self.System.createRigController(self.System.TDcrc.TDDistortCircle,"Swing",CtlName,CtlColor,30)
         self.SwingGP = cmds.group(CtlName,name="Swing_GP")
-        self.SwingCtlGP = self.TDMRS.createGP(self.SwingCtl,"%s_GP"%self.SwingCtl)
+        self.SwingCtlGP = self.System.createGP(self.SwingCtl,"%s_GP"%self.SwingCtl)
 
         return [self.SwingCtlGP,self.SwingGP]
 

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import maya.cmds as cmds
-from TDModularRiggingSystem import RigController
+from TDModularRiggingSystem.lib import Controller as Controller
 
-reload(RigController)
+reload(Controller)
 
 class ModularRiggingSystem(object):
     def __init__(self):
-        self.TDcrc       = RigController.TDCreateRigController()
+        self.TDcrc       = Controller.TDCreateRigController()
         self.selHJ       = cmds.ls(sl=True,dag=True,type="joint") #選択したジョイント階層をすべて取得
         self.jointLabel  = {} #ジョイントのラベル情報の辞書
         self.jointRotate = {} #回転値が入ったジョイントを辞書で返す
@@ -132,8 +132,8 @@ class ModularRiggingSystem(object):
         return name+"."+longName
 
     #文字列アトリビュートの作成
-    def createStringAddAttr(self,name,longName,attrName,enum,dv=0):
-        cmds.addAttr(name,ln=longName,at=attrName,en=enum,dv=dv)
+    def createStringAddAttr(self,name,longName,attrName,enum,dv=0,min=0,max=1):
+        cmds.addAttr(name,ln=longName,at=attrName,en=enum,dv=dv,min=min,max=max)
         cmds.setAttr(name+"."+longName,k=True)
         return name+"."+longName
 
