@@ -6,7 +6,7 @@ from TDModularRiggingSystem.lib import System as System
 class TDRootRigging():
     def __init__(self):
         self.System  = System.ModularRiggingSystem()
-
+    """
     "-----コマンドの実行-----"
     def setRootRigging(self,rootJoints,CtlColor,CtlScale):
         self.rootJoint = TDRootRigging.createRootJoint(self,[rootJoints])
@@ -14,7 +14,7 @@ class TDRootRigging():
         self.createRootCtlConnection(self)
 
         return [self.RootCtlList[0],self.RootCtlList[1],self.RootCtlList[2],self.rootJoint[0]]
-
+    """
     #ルートリグ用の新しいジョイントを作成
     def createRootJoint(self,rootJoints):
         self.rootJoint = self.System.createRiggingJoint(rootJoints,1,"Add")

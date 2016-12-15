@@ -7,11 +7,13 @@ class TDAllCtlRigging():
     def __init__(self):
         self.System  = System.ModularRiggingSystem()
 
+    """
     "-----コマンドの実行-----"
     def setAllRigging(self,CtlColor,CtlScale):
         self.AllCtlList = TDAllCtlRigging.createAllCtl(self,CtlColor,CtlScale)
 
         return self.AllCtlList
+    """
 
     #オールコントローラー
     def createAllCtl(self,CtlColor,CtlScale):

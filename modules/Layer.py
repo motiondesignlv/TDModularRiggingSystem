@@ -59,10 +59,12 @@ class TDCtlLayering():
         cmds.parent(LFootCtlList[4],"IKSystem_GP")
         """
     #コントローラーの親子構造を作成
-    def setCtlParent(self,RootCtlList,SpineCtlList):
+    def setSpineCtlParent(self,RootCtlList,SpineCtlList):
         "Neck → Head"
         #cmds.parentConstraint(NeckCtlList[1],HeadCtlList[1],mo=True)
-        "Spine → Neck"
-        #cmds.parentConstraint(SpineCtlList[1],NeckCtlList[-1],mo=True)
         "Root → Spine"
-        cmds.parentConstraint(RootCtlList[-1],SpineCtlList[-1],mo=True)
+        cmds.parentConstraint(RootCtlList,SpineCtlList,mo=True)
+
+    def setNeckCtlParent(self,SpineCtlList,NeckCtlList):
+        "Spine → Neck"
+        cmds.parentConstraint(SpineCtlList,NeckCtlList,mo=True)

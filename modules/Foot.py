@@ -7,7 +7,7 @@ class TDFootRigging():
     def __init__(self):
         #super(TDFootRigging,self).__init__()
         self.System  = System.ModularRiggingSystem()
-
+    """
     "-----コマンドの実行-----"
     def setFootRigging(self,footJoints,CtlColor,CtlScale):#LR,CtlColor
         #--ジョイントの作成--
@@ -32,7 +32,7 @@ class TDFootRigging():
 
         print "--result Foot setup--\n",
         return [self.IKFootGrpList[0],self.IKFootGrpList[1],self.IKFootGrpList[2],self.IKFootGrpList[3],self.IKHandleGP]
-
+    """
 
     #足リグ用の新しいジョイントを作成
     def createFootJoint(self,footJoints):

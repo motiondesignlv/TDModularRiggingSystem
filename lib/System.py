@@ -88,7 +88,7 @@ class ModularRiggingSystem(object):
 
     #リグのヌル階層を作成
     def createRigHierarchy(self):
-        self.RootGP = cmds.group(n="Root",em=True)
+        self.RootGP = cmds.group(n="Main",em=True)
         self.GP1Name = ["Geometry_GP","Motion_GP"]
         self.GP2Name = ["Joint_GP","Ctl_GP","MotionSystem_GP"]
         self.GP3Name = ["JointSystem_GP","IKSystem_GP","FKIKSystem_GP"]
@@ -217,3 +217,11 @@ class ModularRiggingSystem(object):
                 self.pivot = cmds.xform(sels,q=True,ws=True,rp=True)
                 self.point = [self.point[0]*valueX-self.pivot[0], self.point[1]*valueY-self.pivot[1], self.point[2]*valueZ-self.pivot[2]]
                 cmds.xform(sels+".cv[%d]"%i,t=self.point)
+
+    #モジュール同士のコネクション関係を作るヌルを作成
+    def createModuleConnectionNull(self,childCtl,parentCtl):
+        self.getPivot = cmds.xform(parentCtl,q=True,ws=True,t=True)
+        self.ConnectionGP = cmds.group(childCtl,n="ConnectionFrom__Add_%s"%parentCtl)
+        cmds.xform(self.ConnectionGP,ws=True,piv = self.getPivot)
+
+        return self.ConnectionGP

@@ -11,7 +11,7 @@ class TDSpineRigging():
         self.spineCtlOffset  = [] #背骨コントローラーのオフセットノード
         self.spineCtlNull = [] #背骨コントローラーのヌルノード
         self.spineNull    = [] #背骨ジョイントのオフセットノード
-
+    """
     "-----コマンドの実行-----"
     def setSpineRigging(self,spineJoints,CtlColor,CtlScale):#,parentName,
         TDSpineRigging.createSpineJoint(self,spineJoints)
@@ -25,6 +25,7 @@ class TDSpineRigging():
 
         print "--result Spine setup--\n",
         return [self.SpineCtlList[0],self.SpineCtlList[1],self.SpineJointGrp[0],self.SpineJointGrp[1]]
+    """
 
     #背骨リグ用の新しいジョイントを作成
     def createSpineJoint(self,spineJoints):
@@ -59,15 +60,12 @@ class TDSpineRigging():
             self.System.matrixConstraint(self.spineCtls[spines],self.FKSpineJoint[spines])
 
     #背骨リグの階層分け
-    def setSpineRigLayering(self,spineJoints):
-        self.getPivot = cmds.xform(self.System.getJointLabelType()[0,1],q=True,ws=True,t=True)
-        self.ConnectionGP = cmds.group(self.spineCtlGP,n="ConnectionFrom__Add_%s"%self.System.getJointLabelType()[0,1])
-        cmds.xform(self.ConnectionGP,ws=True,piv = self.getPivot)
-
-        self.spineCtlGrp = cmds.group(self.ConnectionGP,name="%s_Ctl_Grp"%spineJoints)
+    def createSpineRigConnectNull(self,spineJoints):
+        self.ConnectionGrp = self.System.createModuleConnectionNull(self.spineCtlGP, spineJoints)
+        self.spineCtlGrp = cmds.group(self.ConnectionGrp,name="%s_Ctl_Grp"%spineJoints)
         self.spineJointGrp = cmds.group(self.spineJoint[0],self.FKSpineJoint[0],name="%s_Joint_Grp"%spineJoints)
 
-        return self.spineJointGrp,self.ConnectionGP
+        return self.spineJointGrp,self.ConnectionGrp
     """
     #背骨ジョイントのオフセットノードを作成
     def createSpineNull(self):
