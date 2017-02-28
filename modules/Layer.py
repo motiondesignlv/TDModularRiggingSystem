@@ -46,18 +46,12 @@ class TDCtlLayering():
         cmds.parent(LFootCtlList[3],"FKIKSystem_GP")
         cmds.parent(RFootCtlList[4],"IKSystem_GP")
         cmds.parent(LFootCtlList[4],"IKSystem_GP")
-        """
-        cmds.parent(RFootCtlList[0],"All_Ctl")
-        cmds.parent(LFootCtlList[0],"All_Ctl")
-        cmds.parent(RFootCtlList[1],RootCtlList[-1])
-        cmds.parent(LFootCtlList[1],RootCtlList[-1])
-        cmds.parent(RFootCtlList[2],"IKSystem_GP")
-        cmds.parent(LFootCtlList[2],"IKSystem_GP")
-        cmds.parent(RFootCtlList[3],"FKIKSystem_GP")
-        cmds.parent(LFootCtlList[3],"FKIKSystem_GP")
-        cmds.parent(RFootCtlList[4],"IKSystem_GP")
-        cmds.parent(LFootCtlList[4],"IKSystem_GP")
-        """
+
+    def setSpineCtlLayering(self,SpineCtlList):
+        "【ルート】"
+        cmds.parent(SpineCtlList[0],"All_Ctl")
+        cmds.parent(SpineCtlList[1],"Add_Hips")
+
     #コントローラーの親子構造を作成
     def setSpineCtlParent(self,RootCtlList,SpineCtlList):
         "Neck → Head"

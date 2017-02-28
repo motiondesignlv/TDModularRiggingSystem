@@ -65,7 +65,7 @@ class TDSpineRigging():
         self.spineCtlGrp = cmds.group(self.ConnectionGrp,name="%s_Ctl_Grp"%spineJoints)
         self.spineJointGrp = cmds.group(self.spineJoint[0],self.FKSpineJoint[0],name="%s_Joint_Grp"%spineJoints)
 
-        return self.spineJointGrp,self.ConnectionGrp
+        return self.spineCtlGrp,self.spineJointGrp,self.ConnectionGrp
     """
     #背骨ジョイントのオフセットノードを作成
     def createSpineNull(self):
