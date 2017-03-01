@@ -64,10 +64,11 @@ class SetUP(object):
         self.Spine.createSpineFKJoint(spineJoints)
         self.SpineCtlList = self.Spine.createSpineFKCtl(spineJoints,CtlColor,CtlScale)
         self.Spine.createSpineFKCtlConnection(spineJoints)
-        self.SpineJointGrp = self.Spine.createSpineRigConnectNull(self.System.getJointLabelType()[0,1])
+        self.SpineParentGrp = self.Spine.createSpineRigConnectParentNull(self.System.getJointLabelType()[0,1])
+        self.SpineJointGrp = self.Spine.createSpineRigConnectNull(spineJoints)
 
         print "--result Spine setup--\n",
-        return [self.SpineJointGrp[0],self.SpineJointGrp[1],self.SpineJointList[-1],self.SpineCtlList[0],self.SpineCtlList[1],self.SpineJointGrp[-1]]
+        return [self.SpineJointGrp[0],self.SpineJointGrp[1],self.SpineParentGrp]
 
     "-----首リグの構築-----"
     def buildNeckRigging(self,neckJoints,CtlColor,CtlScale):#,CtlName,parentName
@@ -124,8 +125,7 @@ class SetUP(object):
         self.Layer.setAllCtlLayering(self.AllCtlList)
         self.Layer.setRootCtlLayering(self.RootCtlList)
         self.Layer.setFootCtlLayering(self.RFootCtlList,self.LFootCtlList,self.RootCtlList)
-        self.Layer.setSpineCtlLayering(self.SpineCtlList)
-        print self.SpineCtlList
+        self.Layer.setSpineCtlLayering(self.SpineCtlList,self.RootCtlList)
 
         self.Layer.setSpineCtlParent(self.RootCtlList[-1],self.SpineCtlList[-1])
         self.Layer.setNeckCtlParent(self.SpineCtlList[0],self.NeckCtlList[-1])

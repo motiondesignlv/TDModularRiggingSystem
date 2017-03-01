@@ -11,21 +11,6 @@ class TDSpineRigging():
         self.spineCtlOffset  = [] #背骨コントローラーのオフセットノード
         self.spineCtlNull = [] #背骨コントローラーのヌルノード
         self.spineNull    = [] #背骨ジョイントのオフセットノード
-    """
-    "-----コマンドの実行-----"
-    def setSpineRigging(self,spineJoints,CtlColor,CtlScale):#,parentName,
-        TDSpineRigging.createSpineJoint(self,spineJoints)
-        TDSpineRigging.createSpineFKJoint(self,spineJoints)
-        self.SpineCtlList = TDSpineRigging.createSpineFKCtl(self,spineJoints,CtlColor,CtlScale)
-        TDSpineRigging.createSpineFKCtlConnection(self,spineJoints)
-        self.SpineJointGrp = TDSpineRigging.setSpineRigLayering(self,spineJoints[0])
-        #TDSpineRigging.createSpineNull(self)
-        #TDSpineRigging.createSpineCtlNull(self)
-        #self.rootConstraintGPList = TDSpineRigging.createRootCtlConstraint(self,parentName)
-
-        print "--result Spine setup--\n",
-        return [self.SpineCtlList[0],self.SpineCtlList[1],self.SpineJointGrp[0],self.SpineJointGrp[1]]
-    """
 
     #背骨リグ用の新しいジョイントを作成
     def createSpineJoint(self,spineJoints):
@@ -59,13 +44,20 @@ class TDSpineRigging():
             self.System.matrixConstraint(self.FKSpineJoint[spines],self.spineJoint[spines])
             self.System.matrixConstraint(self.spineCtls[spines],self.FKSpineJoint[spines])
 
+    #親となるモジュールとの関連付け用のヌルを作成
+    def createSpineRigConnectParentNull(self,parentJoints):
+        self.ConnectionGrp = self.System.createModuleConnectionNull(self.spineCtlGP, parentJoints)
+
+        return self.ConnectionGrp
+
     #背骨リグの階層分け
     def createSpineRigConnectNull(self,spineJoints):
-        self.ConnectionGrp = self.System.createModuleConnectionNull(self.spineCtlGP, spineJoints)
-        self.spineCtlGrp = cmds.group(self.ConnectionGrp,name="%s_Ctl_Grp"%spineJoints)
-        self.spineJointGrp = cmds.group(self.spineJoint[0],self.FKSpineJoint[0],name="%s_Joint_Grp"%spineJoints)
+        #self.ConnectionGrp = self.System.createModuleConnectionNull(self.spineCtlGP, spineJoints)
+        self.spineCtlGrp = cmds.group(self.ConnectionGrp,name="%s_Ctl_Grp"%spineJoints[0])
+        self.spineJointGrp = cmds.group(self.spineJoint[0],self.FKSpineJoint[0],name="%s_Joint_Grp"%spineJoints[0])
+        cmds.xform([self.spineCtlGrp,self.spineJointGrp],piv=[0,0,0])
 
-        return self.spineCtlGrp,self.spineJointGrp,self.ConnectionGrp
+        return self.spineCtlGrp,self.spineJointGrp
     """
     #背骨ジョイントのオフセットノードを作成
     def createSpineNull(self):

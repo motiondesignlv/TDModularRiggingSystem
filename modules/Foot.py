@@ -7,32 +7,6 @@ class TDFootRigging():
     def __init__(self):
         #super(TDFootRigging,self).__init__()
         self.System  = System.ModularRiggingSystem()
-    """
-    "-----コマンドの実行-----"
-    def setFootRigging(self,footJoints,CtlColor,CtlScale):#LR,CtlColor
-        #--ジョイントの作成--
-        TDFootRigging.createFootJoint(self,footJoints)
-        self.FKJoint = TDFootRigging.createFootFKJoint(self,footJoints)
-        self.IKJoint = TDFootRigging.createFootIKJoint(self,footJoints)
-        #--コントローラーの作成--
-        TDFootRigging.createFootFKCtl(self,self.FKJoint,CtlColor,CtlScale)
-        TDFootRigging.createFootIKCtl(self,self.IKJoint[-1],CtlColor,CtlScale)
-        self.IKHandleGP = TDFootRigging.createFootIKHandle(self,self.IKJoint[0],self.IKJoint[-1])
-        TDFootRigging.createKneeIKCtl(self,self.IKJoint[1],CtlColor,CtlScale)
-        TDFootRigging.createAnnotateNode(self,self.IKJoint[1])
-        TDFootRigging.createFootFKIKSwitchCtl(self,footJoints,CtlScale)
-        TDFootRigging.addFootFKIKSwitchAttr(self,footJoints)
-        #--コントローラーとジョイントのコネクション--
-        TDFootRigging.createFootAddJointConnection(self,footJoints)
-        TDFootRigging.createFootFKConnection(self,footJoints)
-        TDFootRigging.createFootIKConnection(self,footJoints)
-        #--コントローラーとジョイントの階層分け--
-        self.IKFootGrpList = TDFootRigging.setFootRigLayering(self,self.IKJoint[-1])
-        TDFootRigging.createFootFKIKSwitchConnection(self,footJoints)
-
-        print "--result Foot setup--\n",
-        return [self.IKFootGrpList[0],self.IKFootGrpList[1],self.IKFootGrpList[2],self.IKFootGrpList[3],self.IKHandleGP]
-    """
 
     #足リグ用の新しいジョイントを作成
     def createFootJoint(self,footJoints):

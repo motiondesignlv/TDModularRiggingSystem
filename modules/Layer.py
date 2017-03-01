@@ -47,10 +47,10 @@ class TDCtlLayering():
         cmds.parent(RFootCtlList[4],"IKSystem_GP")
         cmds.parent(LFootCtlList[4],"IKSystem_GP")
 
-    def setSpineCtlLayering(self,SpineCtlList):
+    def setSpineCtlLayering(self,SpineCtlList,RootCtlList):
         "【ルート】"
         cmds.parent(SpineCtlList[0],"All_Ctl")
-        cmds.parent(SpineCtlList[1],"Add_Hips")
+        cmds.parent(SpineCtlList[1],RootCtlList[-1])
 
     #コントローラーの親子構造を作成
     def setSpineCtlParent(self,RootCtlList,SpineCtlList):

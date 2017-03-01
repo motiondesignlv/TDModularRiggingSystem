@@ -1,0 +1,23 @@
+#îwçúÇÃIK
+import maya.cmds as cmds
+
+sel = cmds.ls(sl=True,dag=True,type="joint")
+pos = []
+
+for sels in sel:
+    pointPP = cmds.xform(sels,q=True,ws=True,t=True)
+    pos.append(pointPP)
+
+curve = cmds.curve(n="IK_Spine_Curve",d=1,p=pos)
+
+cmds.ikHandle( sol="ikSplineSolver",sj=sel[0],ee=sel[-1],c=curve,fj=True )
+cmds.rebuildCurve(curve,s=2)
+
+curveShape = cmds.listRelatives(curve,s=True)
+cv = cmds.getAttr(curveShape[0]+".spans") + cmds.getAttr(curveShape[0]+".degree")
+
+for cvs in range(cv):
+    cvPos = cmds.pointPosition(curveShape[0]+".cv[%d]"%cvs)
+    loc = cmds.spaceLocator(p=cvPos)
+    locShape = cmds.listRelatives(loc,s=True)
+    cmds.connectAttr(locShape[0]+".worldPosition[0]",curveShape[0]+".controlPoints[%d]"%cvs)
