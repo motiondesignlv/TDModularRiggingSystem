@@ -168,14 +168,6 @@ class ModularRiggingSystem(object):
         #self.createChildAttrToParentGP(CtlName,self.RigCtr)
         return [self.ctlOffsetGP,self.RigCtr]
 
-    #モジュール関連づけ用のヌルを作成
-    def createModuleParentNull(self,parentName,childName):
-        self.getPivot = cmds.xform(parentName,q=True,ws=True,rp=True)
-        self.ConstraintGP = cmds.group(childName, n="Constraint_From__%s_Ctl"%parentName,r=True)
-        cmds.xform(self.ConstraintGP,ws=True,piv = self.getPivot)
-
-        return self.ConstraintGP
-
     #nodeに指定したジョイント階層を複製し、リネーム
     def dupRenameJoint(self,node,name):
         self.dupJointList = [] #複製しリネームしたジョイント階層名
@@ -217,6 +209,14 @@ class ModularRiggingSystem(object):
                 self.pivot = cmds.xform(sels,q=True,ws=True,rp=True)
                 self.point = [self.point[0]*valueX-self.pivot[0], self.point[1]*valueY-self.pivot[1], self.point[2]*valueZ-self.pivot[2]]
                 cmds.xform(sels+".cv[%d]"%i,t=self.point)
+
+    #モジュール関連づけ用のヌルを作成
+    def createModuleParentNull(self,parentName,childName):
+        self.getPivot = cmds.xform(parentName,q=True,ws=True,rp=True)
+        self.ConstraintGP = cmds.group(childName, n="Constraint_From__%s_Ctl"%parentName,r=True)
+        cmds.xform(self.ConstraintGP,ws=True,piv = self.getPivot)
+
+        return self.ConstraintGP
 
     #モジュール同士のコネクション関係を作るヌルを作成
     def createModuleConnectionNull(self,childCtl,parentCtl):
