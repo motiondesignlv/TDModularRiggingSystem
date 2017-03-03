@@ -24,6 +24,14 @@ class TDSpineRigging():
 
         return self.FKSpineJoint
 
+    #IKの背骨のジョイントを作成
+    def createSpineIKJoint(self,spineJoints,hipJoints):
+        self.IKSpineJoints = spineJoints
+        self.IKSpineJoints.insert(0,hipJoints)
+        self.IKSpineJoint = self.System.createRiggingJoint(self.IKSpineJoints,0,"IK")
+
+        return self.IKSpineJoint
+
     #FKの背骨のコントローラーの作成
     def createSpineFKCtl(self,spineJoints,CtlColor,CtlScale):
         for spines in range(len(spineJoints)):

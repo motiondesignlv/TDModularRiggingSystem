@@ -62,6 +62,8 @@ class SetUP(object):
     def buildSpineRigging(self,spineJoints,CtlColor,CtlScale):
         self.SpineJointList = self.Spine.createSpineJoint(spineJoints)
         self.Spine.createSpineFKJoint(spineJoints)
+        self.Spine.createSpineIKJoint(spineJoints,self.System.getJointLabelType()[0,1])
+        print spineJoints
         self.SpineCtlList = self.Spine.createSpineFKCtl(spineJoints,CtlColor,CtlScale)
         self.Spine.createSpineFKCtlConnection(spineJoints)
         self.SpineParentGrp = self.Spine.createSpineRigConnectParentNull(self.System.getJointLabelType()[0,1])
