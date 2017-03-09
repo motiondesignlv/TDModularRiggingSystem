@@ -60,12 +60,21 @@ class SetUP(object):
 
     "-----背骨リグの構築-----"
     def buildSpineRigging(self,spineJoints,CtlColor,CtlScale):
+        #--ジョイントの作成--
         self.SpineJointList = self.Spine.createSpineJoint(spineJoints)
         self.Spine.createSpineFKJoint(spineJoints)
-        self.Spine.createSpineIKJoint(spineJoints,self.System.getJointLabelType()[0,1])
-        print spineJoints
-        self.SpineCtlList = self.Spine.createSpineFKCtl(spineJoints,CtlColor,CtlScale)
+        self.spineIKJoint   = self.Spine.createSpineIKJoint(self.System.getSpineJoint("ik"))
+        #--コントローラーの作成--
+        self.SpineIKHandleList   = self.Spine.createSpineIKHandle(self.spineIKJoint)
+        self.SpineFKCtlList      = self.Spine.createSpineFKCtl(spineJoints,CtlColor,CtlScale)
+        self.SpineIKCtlList      = self.Spine.createSpineIKCtl(spineJoints,CtlColor,CtlScale)
+        self.SpineFKIKSwitchList = self.Spine.createSpineFKIKSwitchCtl(spineJoints,CtlScale)
+        self.Spine.addSpineFKIKSwitchAttr()
+        #--コネクション--
         self.Spine.createSpineFKCtlConnection(spineJoints)
+        self.Spine.createSpineIKCtlConnection(spineJoints)
+        self.Spine.createSpineFKIKSwitchConnection(spineJoints)
+        #--階層分け--
         self.SpineParentGrp = self.Spine.createSpineRigConnectParentNull(self.System.getJointLabelType()[0,1])
         self.SpineJointGrp = self.Spine.createSpineRigConnectNull(spineJoints)
 
@@ -77,7 +86,7 @@ class SetUP(object):
         self.NeckJointList = self.Neck.createNeckJoint(neckJoints)
         self.NeckCtlList = self.Neck.createNeckFKCtl(neckJoints,CtlColor,CtlScale)
         self.Neck.setNeckCtlConnection(self.NeckJointList)
-        self.NeckCtlConnectList = self.Neck.createNeckRigConnectNull(self.System.getSpineJoint()[-1])
+        self.NeckCtlConnectList = self.Neck.createNeckRigConnectNull(self.System.getNeckJoint()[-1])
 
         return [self.NeckJointList[0],self.NeckCtlList[0],self.NeckCtlList[1],self.NeckCtlConnectList]
 
@@ -95,11 +104,11 @@ class SetUP(object):
         self.Foot.createAnnotateNode(self.IKJoint[1])
         self.Foot.createFootFKIKSwitchCtl(footJoints,CtlScale)
         self.Foot.addFootFKIKSwitchAttr(footJoints)
-        #--コントローラーとジョイントのコネクション--
+        #--コネクション--
         self.Foot.createFootAddJointConnection(footJoints)
         self.Foot.createFootFKConnection(footJoints)
         self.Foot.createFootIKConnection(footJoints)
-        #--コントローラーとジョイントの階層分け--
+        #--階層分け--
         self.IKFootGrpList = self.Foot.setFootRigLayering(self.IKJoint[-1])
         self.Foot.createFootFKIKSwitchConnection(footJoints)
 
@@ -111,8 +120,8 @@ class SetUP(object):
         self.AllCtlList    = self.buildAllRigging(20,self.CtlScale)
         self.RootCtlList   = self.buildRootRigging(self.System.getJointLabelType()[0,1],14,self.CtlScale)
         #self.SwitchCtlList = self.Switch.setSwitchRigging(20)
-        self.SpineCtlList  = self.buildSpineRigging(self.System.getSpineJoint(),17,self.CtlScale)
-        self.NeckCtlList   = self.buildNeckRigging(self.System.getNeckJoint(),17,self.CtlScale)
+        self.SpineCtlList  = self.buildSpineRigging(self.System.getSpineJoint("fk"),17,self.CtlScale)
+        #self.NeckCtlList   = self.buildNeckRigging(self.System.getNeckJoint(),17,self.CtlScale)
         """
         self.HeadCtlList   = self.Head.setHeadRigging(self.System.getJointLabelType()[0,8],TDMRS.getJointLabelType()[0,7],17)
         """
@@ -124,10 +133,11 @@ class SetUP(object):
         LArmCtlList   = Arm.setArmRigging(1,6,SwitchCtlList[0],SwitchCtlList[1])
         RArmCtlList   = Arm.setArmRigging(2,13,SwitchCtlList[0],SwitchCtlList[2])
         """
+
         self.Layer.setAllCtlLayering(self.AllCtlList)
         self.Layer.setRootCtlLayering(self.RootCtlList)
         self.Layer.setFootCtlLayering(self.RFootCtlList,self.LFootCtlList,self.RootCtlList)
-        self.Layer.setSpineCtlLayering(self.SpineCtlList,self.RootCtlList)
+        self.Layer.setSpineCtlLayering(self.SpineCtlList,self.RootCtlList,self.SpineFKIKSwitchList,self.SpineIKHandleList)
 
         self.Layer.setSpineCtlParent(self.RootCtlList[-1],self.SpineCtlList[-1])
-        self.Layer.setNeckCtlParent(self.SpineCtlList[0],self.NeckCtlList[-1])
+        #self.Layer.setNeckCtlParent(self.SpineCtlList[0],self.NeckCtlList[-1])

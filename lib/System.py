@@ -11,6 +11,9 @@ class ModularRiggingSystem(object):
         self.selHJ       = cmds.ls(sl=True,dag=True,type="joint") #選択したジョイント階層をすべて取得
         self.jointLabel  = {} #ジョイントのラベル情報の辞書
         self.jointRotate = {} #回転値が入ったジョイントを辞書で返す
+        self.GP1Name = ["Geometry_Grp","Motion_Grp"]
+        self.GP2Name = ["Joint_Grp","Ctl_Grp","MotionSystem_Grp"]
+        self.GP3Name = ["JointSystem_Grp","IKSystem_Grp","FKIKSystem_Grp"]
         if self.selHJ == []:
             cmds.error(u"ジョイントを選択して下さい")
 
@@ -26,7 +29,7 @@ class ModularRiggingSystem(object):
 
     #首のジョイントを取得
     def getNeckJoint(self):
-        self.neckJoint = [] #背骨ジョイント
+        self.neckJoint = [] #首ジョイント
         for self.selHJs in self.selHJ:
             self.jointSide = cmds.getAttr(self.selHJs+".side")#ジョイントのサイド
             self.jointType = cmds.getAttr(self.selHJs+".type")#ジョイントのタイプ
@@ -35,14 +38,20 @@ class ModularRiggingSystem(object):
         return self.neckJoint
 
     #背骨のジョイントを取得
-    def getSpineJoint(self):
+    def getSpineJoint(self,type):
+        self.hipJoint = []
         self.spineJoint = [] #背骨ジョイント
         for self.selHJs in self.selHJ:
             self.jointSide = cmds.getAttr(self.selHJs+".side")#ジョイントのサイド
             self.jointType = cmds.getAttr(self.selHJs+".type")#ジョイントのタイプ
             if self.jointType == 6:
                 self.spineJoint.append(self.selHJs)
-        return self.spineJoint
+            if self.jointType == 1:
+                self.hipJoint.append(self.selHJs)
+        if type == "fk":
+            return self.spineJoint
+        elif type == "ik":
+            return self.hipJoint + self.spineJoint
 
     #指定したジョイント間のジョイント名を取得
     def getBetweenJoint(self,first,last):
@@ -70,6 +79,12 @@ class ModularRiggingSystem(object):
         cmds.xform(self.gp,ws=True,piv = self.getPivot)
         return self.gp
 
+    #センターピボットのヌルを作成
+    def createCenterPivotGP(self,node,name):
+        self.gp = cmds.group(node,n="%s"%name,r=True)
+        cmds.xform(self.gp,ws=True,piv = [0,0,0])
+        return [self.gp]
+
     #子供のアトリビュートを作成した親ヌルへ
     def createChildAttrToParentGP(self,node,name):
         self.parentGP = self.createGP(node,name)
@@ -89,9 +104,6 @@ class ModularRiggingSystem(object):
     #リグのヌル階層を作成
     def createRigHierarchy(self):
         self.RootGP = cmds.group(n="Main",em=True)
-        self.GP1Name = ["Geometry_GP","Motion_GP"]
-        self.GP2Name = ["Joint_GP","Ctl_GP","MotionSystem_GP"]
-        self.GP3Name = ["JointSystem_GP","IKSystem_GP","FKIKSystem_GP"]
         for GP1 in range(len(self.GP1Name)):
             cmds.group(n="%s"%self.GP1Name[GP1],em=True,p=self.RootGP)
         for GP2 in range(len(self.GP2Name)):
