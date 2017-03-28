@@ -93,40 +93,41 @@ class SetUP(object):
     "-----脚リグの構築-----"
     def buildFootRigging(self,footJoints,CtlColor,CtlScale):
         #--ジョイントの作成--
-        self.Foot.createFootJoint(footJoints)
-        self.FKJoint = self.Foot.createFootFKJoint(footJoints)
-        self.IKJoint = self.Foot.createFootIKJoint(footJoints)
+        self.footJoint   = self.Foot.createFootJoint(footJoints)
+        self.footFKJoint = self.Foot.createFootJoint(footJoints,"FK")
+        self.footIKJoint = self.Foot.createFootJoint(footJoints,"IK")
         #--コントローラーの作成--
-        self.Foot.createFootFKCtl(self.FKJoint,CtlColor,CtlScale)
-        self.Foot.createFootIKCtl(self.IKJoint[-1],CtlColor,CtlScale)
-        self.IKHandleGP = self.Foot.createFootIKHandle(self.IKJoint[0],self.IKJoint[-1])
-        self.Foot.createKneeIKCtl(self.IKJoint[1],CtlColor,CtlScale)
-        self.Foot.createAnnotateNode(self.IKJoint[1])
-        self.Foot.createFootFKIKSwitchCtl(footJoints,CtlScale)
-        self.Foot.addFootFKIKSwitchAttr(footJoints)
+        self.footFKCtl         = self.Foot.createFootFKCtl(self.footFKJoint,CtlColor,CtlScale)
+        self.footIKCtl         = self.Foot.createFootIKCtl(self.footIKJoint,CtlColor,CtlScale)
+        self.footIKHandleGrp   = self.Foot.createFootIKHandle(self.footIKJoint[0],self.footIKJoint[-1],self.footIKCtl)
+        self.footKneeIKCtl     = self.Foot.createKneeIKCtl(self.footIKJoint[1],CtlColor,CtlScale)
+        self.footAnnotate      = self.Foot.createAnnotateNode(self.footIKJoint[1])
+        self.footFKIKSwitchCtl = self.Foot.createFootFKIKSwitchCtl(footJoints,CtlScale)
+        self.Foot.addFootFKIKSwitchAttr(self.footFKIKSwitchCtl)
         #--コネクション--
-        self.Foot.createFootAddJointConnection(footJoints)
-        self.Foot.createFootFKConnection(footJoints)
-        self.Foot.createFootIKConnection(footJoints)
+        self.Foot.createFootAddJointConnection(footJoints,self.footJoint,self.footFKJoint,self.footIKJoint)
+        self.Foot.createFootFKConnection(footJoints,self.footFKJoint)
+        self.Foot.createFootIKConnection(footJoints,self.footIKJoint,self.footIKCtl,self.footKneeIKCtl,self.footIKHandleGrp)
+        self.Foot.createFootFKIKSwitchConnection(footJoints,self.footFKCtl,self.footIKCtl,self.footKneeIKCtl,self.footIKHandleGrp,self.footAnnotate)
         #--階層分け--
-        self.IKFootGrpList = self.Foot.setFootRigLayering(self.IKJoint[-1])
-        self.Foot.createFootFKIKSwitchConnection(footJoints)
+        #self.IKFootGrpList = self.Foot.setFootRigLayering(self.footIKJoint[-1])
 
         print "--result Foot setup--\n",
-        return [self.IKFootGrpList[0],self.IKFootGrpList[1],self.IKFootGrpList[2],self.IKFootGrpList[3],self.IKHandleGP]
+        #return [self.IKFootGrpList[0],self.IKFootGrpList[1],self.IKFootGrpList[2],self.IKFootGrpList[3],self.footIKHandleGrp]
 
-    def build(self):
+
+    def build(self,CtlScale=1):
         self.System.createRigHierarchy()
-        self.AllCtlList    = self.buildAllRigging(20,self.CtlScale)
-        self.RootCtlList   = self.buildRootRigging(self.System.getJointLabelType()[0,1],14,self.CtlScale)
+        #self.AllCtlList    = self.buildAllRigging(20,self.CtlScale*CtlScale)
+        #self.RootCtlList   = self.buildRootRigging(self.System.getJointLabelType()[0,1],14,self.CtlScale*CtlScale)
         #self.SwitchCtlList = self.Switch.setSwitchRigging(20)
-        self.SpineCtlList  = self.buildSpineRigging(self.System.getSpineJoint("fk"),17,self.CtlScale)
+        #self.SpineCtlList  = self.buildSpineRigging(self.System.getSpineJoint("fk"),17,self.CtlScale*CtlScale)
         #self.NeckCtlList   = self.buildNeckRigging(self.System.getNeckJoint(),17,self.CtlScale)
         """
         self.HeadCtlList   = self.Head.setHeadRigging(self.System.getJointLabelType()[0,8],TDMRS.getJointLabelType()[0,7],17)
         """
-        self.LFootCtlList  = self.buildFootRigging([self.System.getJointLabelType()[1,2],self.System.getJointLabelType()[1,3],self.System.getJointLabelType()[1,4]],6,self.CtlScale)
-        self.RFootCtlList  = self.buildFootRigging([self.System.getJointLabelType()[2,2],self.System.getJointLabelType()[2,3],self.System.getJointLabelType()[2,4]],13,self.CtlScale)
+        self.LFootCtlList  = self.buildFootRigging([self.System.getJointLabelType()[1,2],self.System.getJointLabelType()[1,3],self.System.getJointLabelType()[1,4]],6,self.CtlScale*CtlScale)
+        self.RFootCtlList  = self.buildFootRigging([self.System.getJointLabelType()[2,2],self.System.getJointLabelType()[2,3],self.System.getJointLabelType()[2,4]],13,self.CtlScale*CtlScale)
 
         """
         SwingCtlList  = Swing.setSwingRigging(TDMRS.getJointLabelType()[0,1],4)
@@ -134,10 +135,10 @@ class SetUP(object):
         RArmCtlList   = Arm.setArmRigging(2,13,SwitchCtlList[0],SwitchCtlList[2])
         """
 
-        self.Layer.setAllCtlLayering(self.AllCtlList)
-        self.Layer.setRootCtlLayering(self.RootCtlList)
-        self.Layer.setFootCtlLayering(self.RFootCtlList,self.LFootCtlList,self.RootCtlList)
-        self.Layer.setSpineCtlLayering(self.SpineCtlList,self.RootCtlList,self.SpineFKIKSwitchList,self.SpineIKHandleList)
+        #self.Layer.setAllCtlLayering(self.AllCtlList)
+        #self.Layer.setRootCtlLayering(self.RootCtlList)
+        #self.Layer.setFootCtlLayering(self.RFootCtlList,self.LFootCtlList,self.RootCtlList)
+        #self.Layer.setSpineCtlLayering(self.SpineCtlList,self.RootCtlList,self.SpineFKIKSwitchList,self.SpineIKHandleList)
 
-        self.Layer.setSpineCtlParent(self.RootCtlList[-1],self.SpineCtlList[-1])
+        #self.Layer.setSpineCtlParent(self.RootCtlList[-1],self.SpineCtlList[-1])
         #self.Layer.setNeckCtlParent(self.SpineCtlList[0],self.NeckCtlList[-1])

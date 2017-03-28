@@ -20,8 +20,18 @@ class MetaData(object):
         self.editString = cmds.setAttr(attrName,attrString,type="string")
         
         return attrString
+    
+    #float型のアトリビュートを追加
+    def addFloatAttribute(self,metaNode,attrName):
+        cmds.addAttr(metaNode,ln=attrName,at="double")
+        cmds.setAttr(metaNode+"."+attrName,e=True,keyable=True)
+        
+        return metaNode+"."+attrName
+        
 
-sel = cmds.ls(sl=True)
+#sel = cmds.ls(sl=True)
 meta = MetaData()
-string = meta.addStringAttribute(sel[0],"t")
-print meta.editStringAttribute(string,"aa")
+node = meta.createMetaNode("metaNode")
+string = meta.addStringAttribute(node,"childMetaData")
+meta.editStringAttribute(string,"test")
+meta.addFloatAttribute(node,"testFloat")
